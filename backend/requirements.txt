@@ -1,0 +1,36 @@
+# FastAPI and web framework
+fastapi>=0.100.0
+uvicorn[standard]>=0.20.0
+python-multipart>=0.0.6
+
+# Image processing and OCR
+Pillow>=9.0.0
+pytesseract>=0.3.10
+opencv-python-headless>=4.8.0
+
+# Google Cloud services
+google-cloud-aiplatform>=1.30.0
+google-cloud-vision>=3.0.0
+google-auth>=2.20.0
+google-generativeai>=0.3.0
+
+# Spotify API
+spotipy>=2.20.0
+
+# Data processing
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+aiofiles>=23.0.0
+httpx>=0.25.0
+
+# Development and testing
+pytest>=7.0.0
+pytest-asyncio>=0.20.0
+black>=23.0.0
+flake8>=6.0.0
+
+# Logging
+structlog>=23.0.0

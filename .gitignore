@@ -5,6 +5,8 @@
 .env.test.local
 .env.production.local
 
+.cache
+
 # Python
 __pycache__/
 *.py[cod]
@@ -88,3 +90,5 @@ htmlcov/
 !/.env
 
 !/.env.example
+/.cache
+/.env
