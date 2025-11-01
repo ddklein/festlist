@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline, Container, Typography, Box, Stepper, Step, StepLabel } from '@mui/material';
-import SpotifyAuth from './components/SpotifyAuth';
+import MusicServiceAuth from './components/MusicServiceAuth';
 import FileUpload from './components/FileUpload';
 import ArtistReview from './components/ArtistReview';
 import PlaylistCreation from './components/PlaylistCreation';
@@ -59,7 +59,7 @@ const theme = createTheme({
 });
 
 
-const steps = ['Connect Spotify', 'Upload Flyer', 'AI Analysis', 'Create Playlist'];
+const steps = ['Connect Music Service', 'Upload Flyer', 'AI Analysis', 'Create Playlist'];
 
 
 
@@ -118,8 +118,8 @@ function App() {
     switch (step) {
       case 0:
         return (
-          <SpotifyAuth
-            onAuthSuccess={(authData) => {
+          <MusicServiceAuth
+            onAuthSuccess={(authData, service) => {
               updateState({ spotifyAuth: authData });
             }}
             onNext={handleNext}

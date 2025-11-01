@@ -4,8 +4,53 @@ const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000
 
 const api = axios.create({
   baseURL: `${API_BASE_URL}/api/v1`,
-  timeout: 30000,
+  timeout: 120000, // Increased timeout to 2 minutes for playlist creation
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
+
+// Add request interceptor for debugging
+api.interceptors.request.use(
+  (config) => {
+    console.log('API Request:', {
+      method: config.method,
+      url: config.url,
+      baseURL: config.baseURL,
+      timeout: config.timeout,
+      headers: config.headers,
+    });
+    return config;
+  },
+  (error) => {
+    console.error('API Request Error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for debugging
+api.interceptors.response.use(
+  (response) => {
+    console.log('API Response:', {
+      status: response.status,
+      statusText: response.statusText,
+      url: response.config.url,
+      data: response.data,
+    });
+    return response;
+  },
+  (error) => {
+    console.error('API Response Error:', {
+      message: error.message,
+      code: error.code,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      url: error.config?.url,
+      data: error.response?.data,
+    });
+    return Promise.reject(error);
+  }
+);
 
 export interface UploadResponse {
   file_id: string;
@@ -183,16 +228,101 @@ export class ApiService {
     playlistDescription?: string,
     tracksPerArtist: number = 3
   ): Promise<PlaylistCreationResponse> {
-    const response = await api.post('/create-playlist', {
-      artists: artists,
-      playlist_name: playlistName,
-      user_id: userId,
-      access_token: accessToken,
-      playlist_description: playlistDescription,
-      tracks_per_artist: tracksPerArtist,
-    });
+    try {
+      const response = await api.post('/create-playlist', {
+        artists: artists,
+        playlist_name: playlistName,
+        user_id: userId,
+        access_token: accessToken,
+        playlist_description: playlistDescription,
+        tracks_per_artist: tracksPerArtist,
+      });
 
-    return response.data;
+      return response.data;
+    } catch (error: any) {
+      // If we get a network error or timeout, but the status is 0,
+      // it might mean the request was processed but the response failed
+      if (error.code === 'ECONNABORTED' || error.response?.status === 0) {
+        // Re-throw with additional context
+        const enhancedError = new Error('Request may have succeeded but response failed');
+        enhancedError.name = 'ResponseError';
+        (enhancedError as any).originalError = error;
+        (enhancedError as any).code = error.code;
+        (enhancedError as any).response = error.response;
+        throw enhancedError;
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Get Amazon Music authorization URL (placeholder)
+   */
+  static async getAmazonMusicAuthUrl(state?: string): Promise<{ auth_url: string }> {
+    throw new Error('Amazon Music integration is not yet implemented');
+  }
+
+  /**
+   * Handle Amazon Music OAuth callback (placeholder)
+   */
+  static async handleAmazonMusicCallback(code: string, state?: string | null): Promise<any> {
+    throw new Error('Amazon Music integration is not yet implemented');
+  }
+
+  /**
+   * Get SoundCloud authorization URL (placeholder)
+   */
+  static async getSoundCloudAuthUrl(state?: string): Promise<{ auth_url: string }> {
+    throw new Error('SoundCloud integration is not yet implemented');
+  }
+
+  /**
+   * Handle SoundCloud OAuth callback (placeholder)
+   */
+  static async handleSoundCloudCallback(code: string, state?: string | null): Promise<any> {
+    throw new Error('SoundCloud integration is not yet implemented');
+  }
+
+  /**
+   * Get Apple Music authorization URL (placeholder)
+   */
+  static async getAppleMusicAuthUrl(state?: string): Promise<{ auth_url: string }> {
+    throw new Error('Apple Music integration is not yet implemented');
+  }
+
+  /**
+   * Handle Apple Music OAuth callback (placeholder)
+   */
+  static async handleAppleMusicCallback(code: string, state?: string | null): Promise<any> {
+    throw new Error('Apple Music integration is not yet implemented');
+  }
+
+  /**
+   * Get Deezer authorization URL (placeholder)
+   */
+  static async getDeezerAuthUrl(state?: string): Promise<{ auth_url: string }> {
+    throw new Error('Deezer integration is not yet implemented');
+  }
+
+  /**
+   * Handle Deezer OAuth callback (placeholder)
+   */
+  static async handleDeezerCallback(code: string, state?: string | null): Promise<any> {
+    throw new Error('Deezer integration is not yet implemented');
+  }
+
+  /**
+   * Get Audiomack authorization URL (placeholder)
+   */
+  static async getAudiomackAuthUrl(state?: string): Promise<{ auth_url: string }> {
+    throw new Error('Audiomack integration is not yet implemented');
+  }
+
+  /**
+   * Handle Audiomack OAuth callback (placeholder)
+   */
+  static async handleAudiomackCallback(code: string, state?: string | null): Promise<any> {
+    throw new Error('Audiomack integration is not yet implemented');
   }
 
   /**

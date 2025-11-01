@@ -61,6 +61,13 @@ const PlaylistCreation: React.FC<PlaylistCreationProps> = ({
     setError(null);
 
     try {
+      console.log('Starting playlist creation with:', {
+        artists: artists.length,
+        playlistName,
+        userId: spotifyAuth.user.id,
+        tracksPerArtist,
+      });
+
       const result = await ApiService.createPlaylistWithAuth(
         artists,
         playlistName,
@@ -70,10 +77,22 @@ const PlaylistCreation: React.FC<PlaylistCreationProps> = ({
         tracksPerArtist
       );
 
+      console.log('Playlist creation successful:', result);
       setPlaylistResult(result);
       onPlaylistCreated(result);
     } catch (err: any) {
-      setError(extractErrorMessage(err, ErrorMessages.PLAYLIST_CREATION_FAILED));
+      console.error('Playlist creation error:', err);
+
+      // Check for specific error types
+      if (err.code === 'ECONNABORTED') {
+        setError('Request timed out. The playlist may have been created successfully. Please check your Spotify account.');
+      } else if (err.code === 'ERR_NETWORK') {
+        setError('Network error. Please check your connection and try again.');
+      } else if (err.response?.status === 0) {
+        setError('Connection failed. The playlist may have been created successfully. Please check your Spotify account.');
+      } else {
+        setError(extractErrorMessage(err, ErrorMessages.PLAYLIST_CREATION_FAILED));
+      }
     } finally {
       setLoading(false);
     }
@@ -82,7 +101,7 @@ const PlaylistCreation: React.FC<PlaylistCreationProps> = ({
 
 
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+    <Box sx={{ maxWidth: 800, mx: 'auto', px: { xs: 2, sm: 0 } }}>
       <Typography variant="h5" gutterBottom>
         Create Spotify Playlist
       </Typography>
@@ -93,7 +112,7 @@ const PlaylistCreation: React.FC<PlaylistCreationProps> = ({
       {!playlistResult ? (
         <>
           {/* Playlist Configuration */}
-          <Paper sx={{ p: 3, mb: 3 }}>
+          <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3 }}>
             <Typography variant="h6" gutterBottom>
               Playlist Configuration
             </Typography>
@@ -160,7 +179,7 @@ const PlaylistCreation: React.FC<PlaylistCreationProps> = ({
           </Paper>
 
           {/* Selected Artists */}
-          <Paper sx={{ p: 3, mb: 3 }}>
+          <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3 }}>
             <Typography variant="h6" gutterBottom>
               Selected Artists ({artists.length})
             </Typography>
@@ -294,12 +313,13 @@ const PlaylistCreation: React.FC<PlaylistCreationProps> = ({
         </Paper>
       )}
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3, flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
         <Button
           startIcon={<ArrowBack />}
           onClick={onBack}
           variant="outlined"
           disabled={loading}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
         >
           Back
         </Button>
@@ -310,6 +330,7 @@ const PlaylistCreation: React.FC<PlaylistCreationProps> = ({
               startIcon={<Refresh />}
               onClick={onReset}
               variant="outlined"
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
             >
               Start Over
             </Button>
@@ -321,6 +342,7 @@ const PlaylistCreation: React.FC<PlaylistCreationProps> = ({
               onClick={handleCreatePlaylist}
               variant="contained"
               disabled={loading || !playlistName.trim() || !spotifyAuth}
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
             >
               Create Playlist
             </Button>

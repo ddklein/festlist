@@ -8,11 +8,14 @@ from dotenv import load_dotenv
 import structlog
 
 from app.api.endpoints import router as api_router
+from app.api.users import router as users_router
 from app.utils.middleware import (
     rate_limit_middleware,
     request_size_middleware,
-    security_headers_middleware
+    security_headers_middleware,
+    request_logging_middleware
 )
+from app.middleware.rate_limit import rate_limit_middleware as firestore_rate_limit
 
 # Load environment variables from project root
 # Try multiple possible locations for .env file
@@ -54,9 +57,11 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
+app.middleware("http")(request_logging_middleware)
 app.middleware("http")(security_headers_middleware)
 app.middleware("http")(request_size_middleware)
-app.middleware("http")(rate_limit_middleware)
+app.middleware("http")(firestore_rate_limit)  # Firestore-based rate limiting for image analysis
+app.middleware("http")(rate_limit_middleware)  # General IP-based rate limiting
 
 app.add_middleware(
     CORSMiddleware,
@@ -131,6 +136,7 @@ async def general_exception_handler(request: Request, exc: Exception):
     )
 
 app.include_router(api_router, prefix="/api/v1")
+app.include_router(users_router, prefix="/api/v1")
 
 @app.get("/")
 async def read_root():

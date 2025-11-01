@@ -12,6 +12,7 @@ from app.models.schemas import (
 )
 from app.services.ocr_service import OCRService
 from app.services.artist_extraction_service import ArtistExtractionService
+from app.services.firebase_service import firebase_service
 from app.utils.file_utils import (
     generate_file_id, is_allowed_file, validate_file_size,
     get_upload_path, save_upload_file, ensure_upload_directory
@@ -257,25 +258,37 @@ async def analyze_image(request: ImageAnalysisRequest):
 @router.post("/create-playlist", response_model=PlaylistCreationResponse)
 async def create_playlist(request: PlaylistCreationRequest):
     try:
+        logger.info(
+            "Playlist creation request received",
+            artist_count=len(request.artists),
+            playlist_name=request.playlist_name,
+            user_id=request.user_id,
+            tracks_per_artist=request.tracks_per_artist
+        )
+
         spotify_service = get_spotify_service()
         if not spotify_service.is_configured:
+            logger.error("Spotify service not configured")
             raise HTTPException(
                 status_code=503,
                 detail="Spotify service not configured. Please set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET."
             )
 
         if not request.user_id:
+            logger.error("User ID missing from request")
             raise HTTPException(status_code=400, detail="User ID required for playlist creation")
 
         if not request.access_token:
+            logger.error("Access token missing from request")
             raise HTTPException(
                 status_code=401,
                 detail="Spotify authentication required. Please authenticate with Spotify first."
             )
 
         access_token = request.access_token
-        
+
         start_time = time.time()
+        logger.info("Starting playlist creation process")
         
         result = await spotify_service.process_artists_to_playlist(
             artist_names=request.artists,
@@ -285,10 +298,12 @@ async def create_playlist(request: PlaylistCreationRequest):
             tracks_per_artist=request.tracks_per_artist,
             playlist_description=request.playlist_description
         )
-        
+
         processing_time = time.time() - start_time
-        
+        logger.info("Spotify service processing completed", processing_time=processing_time)
+
         if not result['success']:
+            logger.error("Playlist creation failed", error=result.get('error'))
             raise HTTPException(status_code=400, detail=result.get('error', 'Playlist creation failed'))
         
         tracks = []
@@ -317,7 +332,23 @@ async def create_playlist(request: PlaylistCreationRequest):
             total_tracks=len(tracks),
             processing_time=processing_time
         )
-        
+
+        # Save playlist to Firestore
+        try:
+            playlist_data = {
+                'playlist_name': playlist_info['name'],
+                'spotify_playlist_id': playlist_info['id'],
+                'artists': request.artists,
+                'total_tracks': len(tracks),
+                'successful_artists': result['successful_artists'],
+                'failed_artists': result['failed_artists']
+            }
+            firebase_service.save_playlist(request.user_id, playlist_data)
+            logger.info("Playlist saved to Firestore", user_id=request.user_id)
+        except Exception as e:
+            logger.warning("Failed to save playlist to Firestore", error=str(e))
+            # Don't fail the request if Firestore save fails
+
         return PlaylistCreationResponse(
             playlist=playlist,
             successful_artists=result['successful_artists'],

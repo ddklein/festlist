@@ -80,10 +80,57 @@ async def request_size_middleware(request: Request, call_next):
 async def security_headers_middleware(request: Request, call_next):
     """Add security headers to responses."""
     response = await call_next(request)
-    
+
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    
+
     return response
+
+
+async def request_logging_middleware(request: Request, call_next):
+    """Log all incoming requests and responses."""
+    start_time = time.time()
+
+    # Log request
+    logger.info(
+        "Request started",
+        method=request.method,
+        url=str(request.url),
+        client_ip=request.client.host if request.client else "unknown",
+        user_agent=request.headers.get("user-agent", "unknown")
+    )
+
+    try:
+        response = await call_next(request)
+
+        # Calculate processing time
+        process_time = time.time() - start_time
+
+        # Log response
+        logger.info(
+            "Request completed",
+            method=request.method,
+            url=str(request.url),
+            status_code=response.status_code,
+            process_time=round(process_time, 3)
+        )
+
+        return response
+
+    except Exception as e:
+        # Calculate processing time for failed requests
+        process_time = time.time() - start_time
+
+        # Log error
+        logger.error(
+            "Request failed",
+            method=request.method,
+            url=str(request.url),
+            error=str(e),
+            error_type=type(e).__name__,
+            process_time=round(process_time, 3)
+        )
+
+        raise

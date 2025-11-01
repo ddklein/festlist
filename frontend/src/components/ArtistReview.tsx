@@ -94,7 +94,7 @@ const ArtistReview: React.FC<ArtistReviewProps> = ({ fileId, onArtistsConfirmed,
   };
 
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+    <Box sx={{ maxWidth: 800, mx: 'auto', px: { xs: 2, sm: 0 } }}>
       <Typography variant="h5" gutterBottom>
         AI Analysis Results
       </Typography>
@@ -103,7 +103,7 @@ const ArtistReview: React.FC<ArtistReviewProps> = ({ fileId, onArtistsConfirmed,
       </Typography>
 
       {/* Extraction Settings */}
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3 }}>
         <Typography variant="h6" gutterBottom>
             Artist AI Agent Settings
         </Typography>
@@ -159,7 +159,7 @@ const ArtistReview: React.FC<ArtistReviewProps> = ({ fileId, onArtistsConfirmed,
       )}
 
       {extractionResult && (
-        <Paper sx={{ p: 3, mb: 3 }}>
+        <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
             <Person sx={{ mr: 1 }} />
             <Typography variant="h6">
@@ -193,6 +193,7 @@ const ArtistReview: React.FC<ArtistReviewProps> = ({ fileId, onArtistsConfirmed,
                     borderColor: 'divider',
                     borderRadius: 1,
                     mb: 1,
+                    py: 1,
                     backgroundColor: selectedArtists.includes(artist.name)
                       ? 'action.selected'
                       : 'background.paper',
@@ -222,13 +223,13 @@ const ArtistReview: React.FC<ArtistReviewProps> = ({ fileId, onArtistsConfirmed,
       )}
 
       {/* Selected Artists */}
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3 }}>
         <Typography variant="h6" gutterBottom>
           Selected Artists ({selectedArtists.length})
         </Typography>
         
         {/* Add new artist */}
-        <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+        <Box sx={{ display: 'flex', gap: 1, mb: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
           <TextField
             size="small"
             placeholder="Add artist manually"
@@ -241,6 +242,7 @@ const ArtistReview: React.FC<ArtistReviewProps> = ({ fileId, onArtistsConfirmed,
             startIcon={<Add />}
             onClick={handleAddArtist}
             disabled={!newArtist.trim()}
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
           >
             Add
           </Button>
@@ -267,11 +269,12 @@ const ArtistReview: React.FC<ArtistReviewProps> = ({ fileId, onArtistsConfirmed,
         )}
       </Paper>
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3, flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
         <Button
           startIcon={<ArrowBack />}
           onClick={onBack}
           variant="outlined"
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
         >
           Back
         </Button>
@@ -281,6 +284,7 @@ const ArtistReview: React.FC<ArtistReviewProps> = ({ fileId, onArtistsConfirmed,
           onClick={handleContinue}
           variant="contained"
           disabled={selectedArtists.length === 0}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
         >
           Create Playlist ({selectedArtists.length} artists)
         </Button>

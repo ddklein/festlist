@@ -13,6 +13,7 @@ from .middleware import (
     rate_limit_middleware,
     request_size_middleware,
     security_headers_middleware,
+    request_logging_middleware,
 )
 
 __all__ = [
@@ -27,4 +28,5 @@ __all__ = [
     "rate_limit_middleware",
     "request_size_middleware",
     "security_headers_middleware",
+    "request_logging_middleware",
 ]

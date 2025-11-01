@@ -193,7 +193,7 @@ const SpotifyAuth: React.FC<SpotifyAuthProps> = ({ onAuthSuccess, onNext }) => {
 
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
             <Avatar
-              src={authData.user.images[0]?.url}
+              src={authData.user.images?.[0]?.url}
               sx={{ width: 64, height: 64, mr: 2 }}
             >
               {authData.user.display_name?.charAt(0) || authData.user.id.charAt(0)}

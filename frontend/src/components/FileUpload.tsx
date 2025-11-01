@@ -62,33 +62,32 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
   });
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto' }}>
-      <Typography variant="h5" gutterBottom>
+    <Box sx={{ maxWidth: 600, mx: 'auto', px: { xs: 2, sm: 0 } }}>
+      <Typography variant="h5" gutterBottom align="center">
         Upload Festival Flyer
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Upload an image of a festival flyer to extract the artist lineup.
       </Typography>
 
       <Paper
         {...getRootProps()}
         sx={{
-          p: 4,
+          p: { xs: 3, sm: 4 },
           border: '2px dashed',
-          borderColor: isDragActive ? 'primary.main' : 'grey.300',
-          backgroundColor: isDragActive ? 'action.hover' : 'background.paper',
+          borderColor: isDragActive ? 'primary.main' : 'rgba(124, 58, 237, 0.35)',
+          backgroundColor: isDragActive ? 'action.hover' : 'rgba(255, 255, 255, 0.04)',
           cursor: 'pointer',
           textAlign: 'center',
           transition: 'all 0.2s ease-in-out',
           '&:hover': {
             borderColor: 'primary.main',
-            backgroundColor: 'action.hover',
+            backgroundColor: 'rgba(255, 255, 255, 0.06)',
           },
+          borderRadius: 3,
+          boxShadow: '0 8px 24px rgba(0,0,0,0.18)'
         }}
       >
         <input {...getInputProps()} />
         
-        <CloudUpload sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+        <CloudUpload sx={{ fontSize: { xs: 36, sm: 48 }, color: 'primary.main', mb: 2 }} />
         
         {isDragActive ? (
           <Typography variant="h6">Drop the flyer here...</Typography>
@@ -100,7 +99,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
             <Typography variant="body2" color="text.secondary" gutterBottom>
               or click to select a file
             </Typography>
-            <Button variant="outlined" sx={{ mt: 2 }}>
+            <Button variant="outlined" sx={{ mt: 2, width: { xs: '100%', sm: 'auto' } }}>
               Choose File
             </Button>
           </>
@@ -150,10 +149,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
           <strong>Tips for best results:</strong>
         </Typography>
         <Typography variant="body2" color="text.secondary" component="ul" sx={{ mt: 1 }}>
-          <li>Use high-resolution images</li>
+          <li>Use high-resolution images from the event website</li>
+          <li>Avoid screenshots, blurry, or low-quality images</li>
           <li>Ensure text is clearly visible</li>
-          <li>Avoid blurry or rotated images</li>
-          <li>Good lighting and contrast work best</li>
         </Typography>
       </Box>
     </Box>
